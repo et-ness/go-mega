@@ -478,12 +478,9 @@ func serializeInt64(val int64) []byte {
 func deserializeInt64(val []byte) (int64, error) {
 	var result int64
 	iLen := int(val[0])
-	if iLen > 8 {
+	if iLen > 8 || iLen > len(val){
 		return -1, errors.New("Wrong mtime attributes")
 	}
-        if iLen > len(val) {
-            iLen = len(val) - 1
-        }
 	for iNdx := iLen; iNdx > 0; iNdx-- {
 		result = (result << 8) + int64(val[iNdx])
 	}
