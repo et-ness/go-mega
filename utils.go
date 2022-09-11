@@ -405,10 +405,10 @@ func computeCRC(infile *os.File, fileSize int64) ([]uint32) {
 	} else if fileSize <= maxFull {
 		fileBuff := make([]byte, fileSize)
 
-                _, err := infile.ReadAt(fileBuff, 0)
-                if err != nil && err != io.EOF {
-                        return nil
-                }
+		_, err := infile.ReadAt(fileBuff, 0)
+		if err != nil && err != io.EOF {
+			return nil
+		}
 		for iNdx := 0; iNdx < crcArrayLength; iNdx++ {
 			begin := int64(iNdx) * fileSize / crcArrayLength
 			end := (int64(iNdx) + 1) * fileSize / crcArrayLength
