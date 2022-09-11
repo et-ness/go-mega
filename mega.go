@@ -1,8 +1,5 @@
 package mega
 
-// #include <string.h>
-import "C"
-
 import (
 	"bytes"
 	"crypto/aes"
@@ -10,6 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/json"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -23,7 +21,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unsafe"
 	b64 "encoding/base64"
 
 	"golang.org/x/crypto/pbkdf2"
@@ -1492,9 +1489,11 @@ func (u *Upload) Finish(infile *os.File, fileSize int64, modificationTime int64)
 
 	crc := computeCRC(infile, fileSize)
 	fingerprintBuf := make([]byte, fingerPrintMaxSize)
-	C.memcpy(unsafe.Pointer(&fingerprintBuf[0]), unsafe.Pointer(&crc[0]), crcSize)
+	for ndx := 0; ndx < crcArrayLength; ndx++ {
+		binary.BigEndian.PutUint32(fingerprintBuf[(ndx*4):], crc[ndx])
+	}
 	aDate := serializeInt64(modificationTime)
-	C.memcpy(unsafe.Pointer(&fingerprintBuf[crcSize]), unsafe.Pointer(&aDate[0]), 8)
+	copy(fingerprintBuf[crcSize:], aDate)
 	aFingerBuff := make([]byte, crcSize + 1 + aDate[0])
 	copy(aFingerBuff, fingerprintBuf)
 

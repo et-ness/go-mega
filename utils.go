@@ -1,8 +1,5 @@
 package mega
 
-// #include <string.h>
-import "C"
-
 import (
 	"os"
 	"io"
@@ -402,8 +399,9 @@ func computeCRC(infile *os.File, fileSize int64) ([]uint32) {
 		if err != nil && err != io.EOF {
 			return nil
 		}
-		// TODO find a solution in golang
-		C.memcpy(unsafe.Pointer(&crc[0]), unsafe.Pointer(&crcBuff[0]), crcSize)
+		for ndx := 0; ndx < crcArrayLength; ndx++ {
+			crc[ndx] = binary.BigEndian.Uint32(crcBuff[(ndx*4):])
+		}
 	} else if fileSize <= maxFull {
 		fileBuff := make([]byte, fileSize)
 
